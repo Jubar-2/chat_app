@@ -1,0 +1,32 @@
+<%- include('../../include/header.ejs'); %>
+    <div id="login-container">
+        <div id="left-column"></div>
+        <div id="branding">
+            <img src="https://seeklogo.com/images/G/green-coffee-logo-1108676399-seeklogo.com.png" />
+            <h1>Login - Chat Application</h1>
+        </div>
+        <div id="login-form">
+            <form method="post" action="/">
+                <input type="text" name="userName" placeholder="enter mobile or email" value="<%= data.username %>" />
+                <% if(errors.userName){%>
+                    <p class="error show">
+                        <%= errors.userName.msg%>
+                    </p>
+                    <% } %>
+
+                        <input type="password" name="password" placeholder="enter password" />
+                        <% if(errors.password){%>
+                            <p class="error show">
+                                <%= errors.password.msg %>
+                            </p>
+                            <% } %>
+                                <% if(errors.common){%>
+                                    <p class="error show">
+                                        <%= errors.common.msg %>
+                                    </p>
+                                    <% } %>
+                                        <input type="submit" value="Login" />
+            </form>
+        </div>
+    </div>
+    <%- include('../../include/footer.ejs');%>

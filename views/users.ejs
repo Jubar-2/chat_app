@@ -1,0 +1,135 @@
+<%- include('../include/header.ejs'); %>
+
+    <div class="manageUser-container">
+        <div id="title">
+            <h2>Manage Users</h2>
+        </div>
+
+        <div class="new-message-container new-user">
+            <a href="#" onclick="openModal()">+</a>
+        </div>
+
+        <div id="users-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Manage</th>
+                    </tr>
+                </thead>
+                <tbody id="users-table">
+                    <% user.forEach(data=> { %>
+                        <tr id="<%= data._id%>">
+                            <td class="name">
+                                <img src="./images/user1.png" />
+                                <span>
+                                    <%= data.name %>
+                                </span>
+                            </td>
+                            <td>
+                                <%= data.email %>
+                            </td>
+                            <td class="manage">
+                                <img src="./images/trash.png" alt="Delete" onclick="deleted('<%=data._id%>')" />
+                            </td>
+                        </tr>
+                        <% }) %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="modal-wrapper" id="add-user-modal" enctype="multipart/form-data">
+        <div class="modal">
+            <a href="#" onclick="closeModal()" class="modal-close">+</a>
+            <div class="modal-title">
+                <h2>Create New User</h2>
+            </div>
+            <div class="modal-body">
+                <form action="/users" method="post" id="add-user-form">
+                    <input type="text" placeholder="enter name" name="name" />
+                    <p class="error" id="nameERR">This is error</p>
+                    <input type="text" placeholder="enter email" name="email" />
+                    <p class="error" id="emailERR">This is error</p>
+                    <input type="text" placeholder="enter mobile" name="mobile" />
+                    <p class="error" id="mobileERR">This is error</p>
+                    <input type="password" placeholder="enter password" name="password" />
+                    <p class="error" id="passwordERR">This is error</p>
+                    <input type="file" name="avatar" />
+                    <p class="error" id="avatarERR">This is error</p>
+                    <input type="submit" value="Submit" id="submit" />
+                </form>
+            </div>
+        </div>
+    </div>
+    <script>
+        const modal = document.querySelector("#add-user-modal");
+        function closeModal() {
+            modal.style.display = "none";
+        }
+        function openModal() {
+            modal.style.display = "block";
+        }
+
+        const from = document.querySelector('#add-user-form');
+        const submit = document.getElementById('submit');
+
+        from.onsubmit = async function (e) {
+            e.preventDefault();
+
+            const error = document.querySelectorAll('.error');
+            error.forEach(ele => ele.classList.remove('show'))
+
+            const fromData = new FormData(from);
+            try {
+
+                const responsave = await fetch('/users', {
+                    method: 'POST',
+                    body: fromData
+                })
+
+                const message = await responsave.json();
+                if (message['errors']) {
+                    Object.keys(message.errors).forEach((name) => {
+                        let element = document.getElementById(`${name}ERR`);
+                        if (element) {
+                            element.innerText = message.errors[name].msg;
+                            element.classList.add('show')
+                        }
+                    })
+                }
+
+                if (message['msg']) {
+                    modal.style.display = "none";
+                    location.reload();
+                }
+
+
+            } catch (err) {
+                console.log(err);
+            }
+
+        };
+
+        async function deleted(id) {
+            try {
+
+                const responsave = await fetch(`/users/${id}`, {
+                    method: 'DELETE'
+                })
+
+                const message = await responsave.json();
+
+                if (message.action) {
+                    document.getElementById(id).remove();
+                }
+
+            } catch (err) {
+                console.log(err);
+            }
+        }
+
+
+    </script>
+    <%- include('../include/footer.ejs'); %>
